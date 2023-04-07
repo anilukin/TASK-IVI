@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Table } from 'react-bootstrap';
+import { ArrowUp, ArrowDown } from 'react-bootstrap-icons';
 import React from 'react';
 
 export function PersonsList({ list }) {
@@ -76,15 +77,33 @@ export function PersonsList({ list }) {
     setSortedKey(key);
   };
 
+  const setArrow = (key) => {
+    let arrow = null;
+    if (sortedKey !== key) {
+      return arrow;
+    }
+    switch (sortDirection) {
+      case 'inc':
+        arrow = <ArrowDown />;
+        break;
+      case 'dec':
+        arrow = <ArrowUp />
+        break;
+      default:
+        break;
+    }
+    return arrow;
+  }
+
   return (
     <>
-      <label for="search">Искать: </label>
+      <label forhtml="search">Искать: </label>
       <br />
       <input id="search" placeholder="Зима близко ..." onChange={(e) => setFilterExpr(e.target.value)} />
       <Table striped bordered hover>
         <thead>
           <tr>
-            {keys.map((key) => <th key={key} onClick={() => { setStates(key) }}>{key}</th>)}
+            {keys.map((key) => <th key={key} onClick={() => { setStates(key) }}>{key}{setArrow(key)}</th>)}
           </tr>
         </thead>
         <tbody>
