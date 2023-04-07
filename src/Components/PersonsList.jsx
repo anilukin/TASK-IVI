@@ -11,12 +11,31 @@ export function PersonsList({ list }) {
 
   let sortedList = [...list];
 
+  const specChar = ['[', ']', '\\', '^', '$', '.', '|', '?', '+', '(', ')'];
+
+  const makeCheck = (expr) => {
+    let newExpr = expr;
+    newExpr = expr.split('')
+      .map((symb) => {
+        if (specChar.includes(symb)) {
+          symb = `\\${symb}`;
+        }
+        if (symb === '*') {
+          symb = '.+'
+        }
+        return symb;
+      })
+      .join('');
+    return newExpr;
+  }
+
   if (filterExpr) {
     const isContainsExpr = (item) => {
       const valuesArr = Object.values(item);
+      const re = new RegExp(makeCheck(filterExpr), 'i');
       for (let i = 0; i < valuesArr.length; i += 1) {
-        const normalizedVal = valuesArr[i].toString().toLowerCase()
-        if (normalizedVal.includes(filterExpr)) {
+        const normalizedVal = valuesArr[i].toString();
+        if (normalizedVal.search(re) >= 0) {
           return true;
         };
       }
@@ -28,10 +47,10 @@ export function PersonsList({ list }) {
   if (sortedKey) {
     switch (sortDirection) {
       case 'inc':
-        sortedList.sort((item1, item2) => item1[sortedKey] > item2[sortedKey] ? 1 : -1);
+        sortedList.sort((item1, item2) => item1[sortedKey] >= item2[sortedKey] ? 1 : -1);
         break;
       case 'dec':
-        sortedList.sort((item1, item2) => item1[sortedKey] > item2[sortedKey] ? -1 : 1);
+        sortedList.sort((item1, item2) => item1[sortedKey] >= item2[sortedKey] ? -1 : 1);
         break;
       default:
         break;
@@ -59,7 +78,9 @@ export function PersonsList({ list }) {
 
   return (
     <>
-      <input onChange={(e) => setFilterExpr(e.target.value.toLowerCase())} />
+      <label for="search">Искать: </label>
+      <br />
+      <input id="search" placeholder="Зима близко ..." onChange={(e) => setFilterExpr(e.target.value)} />
       <Table striped bordered hover>
         <thead>
           <tr>
